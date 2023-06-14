@@ -142,6 +142,8 @@ public class Employe {
         document.append("salaire", this.salaire);
 
         collection.insertOne(document);
+
+        this.setId(document.getObjectId("_id").toString());
     }
 
     public void updateEmploye() {
@@ -207,7 +209,7 @@ public class Employe {
             Employe employe = new Employe(result.getString("nom"), result.getString("prenom"),
                     result.getString("adresse"), result.getString("telephone"), result.getString("email"),
                     result.getString("dateNaissance"), result.getString("dateEmbauche"), result.getDouble("salaire"), Agence.getAgenceById(result.getString("agence")));
-            employe.setId(result.getString("_id"));
+            employe.setId(result.getObjectId("_id").toString());
             return employe;
         }
 

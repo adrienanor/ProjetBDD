@@ -6,9 +6,12 @@ import com.mongodb.client.*;
 import com.mongodb.client.model.*;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.bson.types.ObjectId;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.mongodb.client.model.Filters.eq;
 
 public class Compte {
     private String id;
@@ -99,6 +102,8 @@ public class Compte {
         document.append("BIC", this.BIC);
 
         collection.insertOne(document);
+
+        this.setId(document.getObjectId("_id").toString());
     }
 
     public void updateCompte() {
@@ -154,13 +159,12 @@ public class Compte {
         MongoDatabase database = client.getDatabase("projetBDD");
         MongoCollection<Document> collection = database.getCollection("compte");
 
-        Document filter = new Document("_id", compteId);
-        Document result = collection.find(filter).first();
+        Document result = collection.find(eq("_id", new ObjectId(compteId))).first();
 
         if (result != null) {
             Compte compte = new Compte(Client.getClientById(result.getString("clientId")),
                     result.getString("typeCompte"), result.getDouble("solde"), result.getString("IBAN"), result.getString("BIC"));
-            compte.setId(result.getString("_id"));
+            compte.setId(result.getObjectId("_id").toString());
             return compte;
         }
 

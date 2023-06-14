@@ -9,10 +9,12 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class DataGenerationMongoDB {
 
@@ -30,7 +32,11 @@ public class DataGenerationMongoDB {
                 Document document = new Document();
                 for (String header : csvParser.getHeaderMap().keySet()) {
                     String value = record.get(header);
-                    document.append(header, value);
+
+                    if (Objects.equals(header, "_id"))
+                        document.append(header, new ObjectId(value));
+                    else
+                        document.append(header, value);
                 }
                 documents.add(document);
             }

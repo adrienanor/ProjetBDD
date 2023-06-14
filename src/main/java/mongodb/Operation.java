@@ -101,6 +101,8 @@ public class Operation {
         document.append("typeOperation", this.typeOperation);
 
         collection.insertOne(document);
+
+        this.setId(document.getObjectId("_id").toString());
     }
 
     public void updateOperation() {
@@ -162,7 +164,7 @@ public class Operation {
         if (result != null) {
             Operation operation = new Operation(Client.getClientById(result.getString("client")), Compte.getCompteById(result.getString("compte")),
                     result.getDate("date"), result.getDouble("montant"), result.getString("typeOperation"));
-            operation.setId(result.getString("_id"));
+            operation.setId(result.getObjectId("_id").toString());
             return operation;
         }
 
@@ -187,7 +189,7 @@ public class Operation {
         collection.find(filter).forEach((Block<? super Document>) (Document document) -> {
             Operation operation = new Operation(Client.getClientById(document.getString("client")), Compte.getCompteById(document.getString("compte")),
                     document.getDate("date"), document.getDouble("montant"), document.getString("typeOperation"));
-            operation.setId(document.getString("_id"));
+            operation.setId(document.getObjectId("_id").toString());
             operations.add(operation);
         });
 
