@@ -77,42 +77,47 @@ public class Compte {
 
     public void insertCompte(Driver driver) {
         try (Session session = driver.session()) {
-            session.writeTransaction(tx -> tx.run(
-                    "CREATE (c:Compte {clientId: $clientId, typeCompte: $typeCompte, solde: $solde, IBAN: $IBAN, BIC: $BIC})",
-                    parameters(
-                            "clientId", this.client.getId(),
-                            "typeCompte", this.typeCompte,
-                            "solde", this.solde,
-                            "IBAN", this.IBAN,
-                            "BIC", this.BIC
-                    )
-            ));
+            String query = "CREATE (c:Compte {clientId: $clientId, typeCompte: $typeCompte, solde: $solde, IBAN: $IBAN, BIC: $BIC}) " +
+                    "RETURN ID(c) AS id";
+            Value parameters = parameters(
+                    "clientId", this.client.getId(),
+                    "typeCompte", this.typeCompte,
+                    "solde", this.solde,
+                    "IBAN", this.IBAN,
+                    "BIC", this.BIC
+            );
+
+            Result result = session.run(query, parameters);
+            if (result.hasNext()) {
+                Record record = result.next();
+                this.id = String.valueOf(record.get("id").asLong());
+            }
         }
     }
 
     public void updateCompte(Driver driver) {
         try (Session session = driver.session()) {
-            session.writeTransaction(tx -> tx.run(
-                    "MATCH (c:Compte {id: $id}) " +
-                            "SET c.clientId = $clientId, c.typeCompte = $typeCompte, c.IBAN = $IBAN, c.BIC = $BIC, c.solde = $solde",
-                    parameters(
-                            "id", this.id,
-                            "clientId", this.client.getId(),
-                            "typeCompte", this.typeCompte,
-                            "IBAN", this.IBAN,
-                            "BIC", this.BIC,
-                            "solde", this.solde
-                    )
-            ));
+            String query = "MATCH (c:Compte) WHERE ID(c) = $id " +
+                    "SET c.clientId = $clientId, c.typeCompte = $typeCompte, c.IBAN = $IBAN, c.BIC = $BIC, c.solde = $solde";
+            Value parameters = parameters(
+                    "id", Long.parseLong(this.id),
+                    "clientId", this.client.getId(),
+                    "typeCompte", this.typeCompte,
+                    "IBAN", this.IBAN,
+                    "BIC", this.BIC,
+                    "solde", this.solde
+            );
+
+            session.run(query, parameters);
         }
     }
 
     public void deleteCompte(Driver driver) {
         try (Session session = driver.session()) {
-            session.writeTransaction(tx -> tx.run(
-                    "MATCH (c:Compte {id: $id}) DELETE c",
-                    parameters("id", this.id)
-            ));
+            String query = "MATCH (c:Compte) WHERE ID(c) = $id DELETE c";
+            Value parameters = parameters("id", Long.parseLong(this.id));
+
+            session.run(query, parameters);
         }
     }
 
@@ -120,25 +125,24 @@ public class Compte {
 
     public static Compte getCompteById(Driver driver, String compteId) {
         try (Session session = driver.session()) {
-            return session.readTransaction(tx -> {
-                Result result = tx.run(
-                        "MATCH (c:Compte {id: $id}) RETURN c",
-                        parameters("id", compteId)
-                );
-                if (result.hasNext()) {
-                    Record record = result.next();
-                    Node compteNode = record.get("c").asNode();
-                    Compte compte = new Compte(Client.getClientById(driver, compteNode.get("clientId").asString()),
-                            compteNode.get("typeCompte").asString(),
-                            compteNode.get("solde").asDouble(),
-                            compteNode.get("IBAN").asString(),
-                            compteNode.get("BIC").asString());
-                    compte.setId(compteNode.get("id").asString());
-                    return compte;
-                }
-                return null;
-            });
+            String query = "MATCH (c:Compte) WHERE ID(c) = $id RETURN c";
+            Value parameters = parameters("id", Long.parseLong(compteId));
+
+            Result result = session.run(query, parameters);
+            if (result.hasNext()) {
+                Record record = result.next();
+                Node compteNode = record.get("c").asNode();
+                Compte compte = new Compte(Client.getClientById(driver, compteNode.get("clientId").asString()),
+                        compteNode.get("typeCompte").asString(),
+                        compteNode.get("solde").asDouble(),
+                        compteNode.get("IBAN").asString(),
+                        compteNode.get("BIC").asString());
+                compte.setId(String.valueOf(compteNode.id()));
+                return compte;
+            }
         }
+
+        return null;
     }
 
     // Méthode pour créer un index secondaire sur le champ "clientId"

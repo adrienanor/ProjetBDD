@@ -22,7 +22,6 @@ public class AgenceTest {
 
     @BeforeEach
     public void clearData() {
-        // Clear the test data before each test
         try (Session session = driver.session()) {
             session.run("MATCH (a:Agence) DETACH DELETE a");
         }
@@ -30,23 +29,18 @@ public class AgenceTest {
 
     @AfterAll
     public static void teardown() {
-        // Close the Neo4j driver
         driver.close();
     }
 
     @Test
     @Order(1)
     public void testInsertAgence() throws InterruptedException {
-        // Create a new Agence object
         Agence agence = new Agence("Agence A", "Address A", "123456789", "email@example.com");
 
-        // Insert the Agence into the database
         agence.insertAgence(driver);
 
-        // Retrieve the Agence from the database by ID
         Agence retrievedAgence = Agence.getAgenceById(driver, agence.getId());
 
-        // Assert that the retrieved Agence is not null and has the same properties as the original Agence
         assertNotNull(retrievedAgence);
         assertEquals(agence.getId(), retrievedAgence.getId());
         assertEquals(agence.getNom(), retrievedAgence.getNom());
