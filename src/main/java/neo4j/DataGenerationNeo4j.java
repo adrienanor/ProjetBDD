@@ -10,7 +10,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class DataGenerationNeo4j {
@@ -77,24 +79,31 @@ public class DataGenerationNeo4j {
             List<String[]> employes = generateEmployesData();
 
             // Insérer les données des employés
-            insertData(session, "CREATE (e:Employe {id: $id, name: $name, agenceId: $agenceId})", employes,
-                    new String[]{"id", "name", "agenceId"});
+            insertData(session, "CREATE (e:Employe {id: $id, nom: $nom, prenom: $prenom, adresse: $adresse, telephone: $telephone, email: $email, " +
+                    "dateNaissance: $dateNaissance, dateEmbauche: $dateEmbauche, salaire: $salaire, agence: $agence})",
+                    employes, new String[]{"id", "nom", "prenom", "adresse", "telephone", "email", "dateNaissance", "dateEmbauche", "salaire", "agence"});
+
 
             // Insérer les données des clients
-            insertData(session, "CREATE (c:Client {id: $id, name: $name, age: $age})", clients,
-                    new String[]{"id", "name", "age"});
+            // Insérer les données des clients
+            insertData(session, "CREATE (c:Client {id: $id, nom: $nom, prenom: $prenom, adresse: $adresse, telephone: $telephone, email: $email, " +
+                    "dateNaissance: $dateNaissance, agence: $agence})", clients, new String[]{"id", "nom", "prenom", "adresse", "telephone", "email", "dateNaissance", "agence"});
+
 
             // Insérer les données des comptes
-            insertData(session, "CREATE (cpt:Compte {id: $id, balance: $balance, clientId: $clientId})", comptes,
-                    new String[]{"id", "balance", "clientId"});
+            insertData(session, "CREATE (cpt:Compte {id: $id, IBAN: $IBAN, BIC: $BIC, typeCompte: $typeCompte, solde: $solde, client: $client})", comptes,
+                    new String[]{"id", "IBAN", "BIC", "typeCompte", "solde", "client"});
+
 
             // Insérer les données des opérations
-            insertData(session, "CREATE (op:Operation {id: $id, description: $description, compteId: $compteId})",
-                    operations, new String[]{"id", "description", "compteId"});
+            insertData(session, "CREATE (op:Operation {id: $id, client: $client, compte: $compte, date: $date, montant: $montant, typeOperation: $typeOperation})",
+                    operations, new String[]{"id", "client", "compte", "date", "montant", "typeOperation"});
+
 
             // Insérer les données des agences
-            insertData(session, "CREATE (a:Agence {id: $id, name: $name, location: $location})", agences,
-                    new String[]{"id", "name", "location"});
+            insertData(session, "CREATE (a:Agence {id: $id, nom: $nom, adresse: $adresse, telephone: $telephone, email: $email})", agences,
+                    new String[]{"id", "nom", "adresse", "telephone", "email"});
+
 
 
         } catch (IOException e) {
@@ -106,13 +115,22 @@ public class DataGenerationNeo4j {
 
 
     private static void insertData(Session session, String query, List<String[]> data, String[] parameters) {
-        for (String[] row : data) {
-            Value parametersValue = parameters(
-                    parameters[0], row[0],
-                    parameters[1], row[1],
-                    parameters[2], row[2]
-            );
-            session.run(query, parametersValue);
+        for (int i = 0; i < data.size(); i++) {
+            if (i == 0) {
+                continue; // Passe à l'itération suivante pour sauter la première ligne
+            }
+
+            String[] row = data.get(i);
+            int parametersLength = parameters.length;
+            Map<String, Object> parameterMap = new HashMap<>();
+
+            for (int j = 0; j < parametersLength; j++) {
+                parameterMap.put(parameters[j], row[j]);
+            }
+
+            session.run(query, parameterMap);
         }
     }
+
+
 }
