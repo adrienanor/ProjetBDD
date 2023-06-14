@@ -12,11 +12,11 @@ import java.util.List;
 
 public class DataGenerationNeo4j {
 
-    private static final String CLIENTS_CSV_PATH = "path/to/clients.csv";
-    private static final String COMPTES_CSV_PATH = "path/to/comptes.csv";
-    private static final String OPERATIONS_CSV_PATH = "path/to/operations.csv";
-    private static final String AGENCES_CSV_PATH = "path/to/agences.csv";
-    private static final String EMPLOYES_CSV_PATH = "path/to/employes.csv";
+    private static final String CLIENTS_CSV_PATH = "src/main/resources/client.csv";
+    private static final String COMPTES_CSV_PATH = "src/main/resources/compte.csv";
+    private static final String OPERATIONS_CSV_PATH = "src/main/resources/operation.csv";
+    private static final String AGENCES_CSV_PATH = "src/main/resources/agence.csv";
+    private static final String EMPLOYES_CSV_PATH = "src/main/resources/employe.csv";
 
     // Méthodes de génération de données pour chaque collection
 
@@ -68,7 +68,10 @@ public class DataGenerationNeo4j {
             List<String[]> employes = generateEmployesData();
 
             // Connexion à la base de données Neo4j
-            Driver driver = GraphDatabase.driver("bolt://localhost:7687", AuthTokens.basic("your_username", "your_password"));
+            Driver driver = GraphDatabase.driver(
+                    "neo4j+s://" + System.getenv("760dbeec.databases.neo4j.io"),
+                    AuthTokens.basic(System.getenv("neo4j"), System.getenv("77yxPdT-1WryEoPehgpVwsMbpEnOQCoK_cRABjuvA_E"))
+            );
             Session session = driver.session();
 
             // Insérer les données dans la base de données
