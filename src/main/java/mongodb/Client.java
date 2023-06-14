@@ -6,9 +6,12 @@ import com.mongodb.client.*;
 import com.mongodb.client.model.*;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.bson.types.ObjectId;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.mongodb.client.model.Filters.eq;
 
 public class Client {
     private String id;
@@ -129,6 +132,8 @@ public class Client {
         document.append("agence", this.agence.getId());
 
         collection.insertOne(document);
+
+        this.setId(document.getObjectId("_id").toString());
     }
 
     public void updateClient() {
@@ -184,14 +189,13 @@ public class Client {
         MongoDatabase database = client.getDatabase("projetBDD");
         MongoCollection<Document> collection = database.getCollection("client");
 
-        Document filter = new Document("_id", clientId);
-        Document result = collection.find(filter).first();
+        Document result = collection.find(eq("_id", new ObjectId(clientId))).first();
 
         if (result != null) {
             Client clientObject = new Client(result.getString("nom"), result.getString("prenom"),
                     result.getString("adresse"), result.getString("telephone"),
-                    result.getString("dateNaissance"), result.getString("email"), Agence.getAgenceById(result.getString("agenceId")));
-            clientObject.setId(result.getString("_id"));
+                    result.getString("dateNaissance"), result.getString("email"), Agence.getAgenceById(result.getString("agence")));
+            clientObject.setId(result.getObjectId("_id").toString());
             return clientObject;
         }
 
