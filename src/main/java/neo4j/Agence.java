@@ -76,21 +76,30 @@ public class Agence {
 
     // Méthodes CRUD
 
-    public void insertAgence(Driver driver) {
+    public String insertAgence(Driver driver) {
         try (Session session = driver.session()) {
-            String query = "CREATE (a:Agence {nom: $nom, adresse: $adresse, telephone: $telephone, email: $email})";
-            session.run(query, Values.parameters(
-                    "nom", this.nom,
-                    "adresse", this.adresse,
-                    "telephone", this.telephone,
-                    "email", this.email
-            ));
+            String query = "CREATE (a:Agence {nom: $nom, adresse: $adresse, telephone: $telephone, email: $email}) RETURN ID(a) AS id, a";
+            Record record = session.writeTransaction(tx -> {
+                Result result = tx.run(query, Values.parameters(
+                        "nom", this.getNom(),
+                        "adresse", this.getAdresse(),
+                        "telephone", this.getTelephone(),
+                        "email", this.getEmail()
+                ));
+
+                return result.single();
+            });
+
+            Node createdNode = record.get("a").asNode();
+            String nodeId = String.valueOf(record.get("id").asLong());
+            this.setId(nodeId);
+            return nodeId;
         }
     }
 
     public void updateAgence(Driver driver) {
         try (Session session = driver.session()) {
-            String query = "MATCH (a:Agence {id: $id}) SET a.nom = $nom, a.adresse = $adresse, a.telephone = $telephone, a.email = $email";
+            String query = "MATCH (a:Agence) WHERE ID(a) = " + this.id + " SET a.nom = $nom, a.adresse = $adresse, a.telephone = $telephone, a.email = $email";
             session.run(query, Values.parameters(
                     "id", this.id,
                     "nom", this.nom,
@@ -103,7 +112,7 @@ public class Agence {
 
     public void deleteAgence(Driver driver) {
         try (Session session = driver.session()) {
-            String query = "MATCH (a:Agence {id: $id}) DELETE a";
+            String query = "MATCH (a:Agence) WHERE Id(a) = " + this.getId() + " DELETE a";
             session.run(query, Values.parameters(
                     "id", this.id
             ));
@@ -114,12 +123,12 @@ public class Agence {
 
     public static Agence getAgenceById(Driver driver, String agenceId) {
         try (Session session = driver.session()) {
-            String query = "MATCH (a:Agence {id: $id}) RETURN a";
-            Record record = session.run(query, Values.parameters(
-                    "id", agenceId
-            )).single();
 
-            if (record != null) {
+            String query = "MATCH (a:Agence) WHERE ID(a) = " + agenceId + " RETURN a";
+            Result result = session.run(query, Values.parameters("id", agenceId));
+
+            if (result.hasNext()) {
+                Record record = result.single();
                 Node node = record.get("a").asNode();
                 Agence agence = new Agence(
                         node.get("nom").asString(),
@@ -127,6 +136,7 @@ public class Agence {
                         node.get("telephone").asString(),
                         node.get("email").asString()
                 );
+
                 agence.setId(agenceId);
                 return agence;
             }
