@@ -13,18 +13,22 @@ public class Client {
     private String nom;
     private String prenom;
     private String adresse;
-    private String numeroTelephone;
+    private String telephone;
     private String dateNaissance;
     private String email;
+    private List<Compte> comptes;
+    private Agence agence;
 
     // Constructeur
-    public Client(String nom, String prenom, String adresse, String numeroTelephone, String dateNaissance, String email) {
+    public Client(String nom, String prenom, String adresse, String telephone, String dateNaissance, String email, Agence agence) {
         this.nom = nom;
         this.prenom = prenom;
         this.adresse = adresse;
-        this.numeroTelephone = numeroTelephone;
+        this.telephone = telephone;
         this.dateNaissance = dateNaissance;
         this.email = email;
+        this.comptes = new ArrayList<Compte>();
+        this.agence = agence;
     }
 
     // Getters et setters pour toutes les propriétés
@@ -60,12 +64,12 @@ public class Client {
         this.adresse = adresse;
     }
 
-    public String getNumeroTelephone() {
-        return numeroTelephone;
+    public String gettelephone() {
+        return telephone;
     }
 
-    public void setNumeroTelephone(String numeroTelephone) {
-        this.numeroTelephone = numeroTelephone;
+    public void settelephone(String telephone) {
+        this.telephone = telephone;
     }
 
     public String getDateNaissance() {
@@ -83,6 +87,22 @@ public class Client {
     public void setEmail(String email) {
         this.email = email;
     }
+    
+    public List<Compte> getComptes() {
+        return comptes;
+    }
+    
+    public void setComptes(List<Compte> comptes) {
+        this.comptes = comptes;
+    }
+    
+    public Agence getAgence() {
+        return agence;
+    }
+    
+    public void setAgence(Agence agence) {
+        this.agence = agence;
+    }
 
     // Méthodes CRUD
     public void insertClient() {
@@ -93,9 +113,10 @@ public class Client {
         document.append("nom", this.nom);
         document.append("prenom", this.prenom);
         document.append("adresse", this.adresse);
-        document.append("numeroTelephone", this.numeroTelephone);
+        document.append("telephone", this.telephone);
         document.append("dateNaissance", this.dateNaissance);
         document.append("email", this.email);
+        document.append("agence", this.agence.getId());
 
         collection.insertOne(document);
     }
@@ -109,8 +130,9 @@ public class Client {
                 .append("nom", this.nom)
                 .append("prenom", this.prenom)
                 .append("adresse", this.adresse)
-                .append("numeroTelephone", this.numeroTelephone)
+                .append("telephone", this.telephone)
                 .append("dateNaissance", this.dateNaissance)
+                .append("agence", this.agence.getId())
                 .append("email", this.email));
 
         collection.updateOne(filter, update);
@@ -133,8 +155,8 @@ public class Client {
 
         if (result != null) {
             Client client = new Client(result.getString("nom"), result.getString("prenom"),
-                    result.getString("adresse"), result.getString("numeroTelephone"),
-                    result.getString("dateNaissance"), result.getString("email"));
+                    result.getString("adresse"), result.getString("telephone"),
+                    result.getString("dateNaissance"), result.getString("email"), Agence.getAgenceById(result.getString("agenceId")));
             client.setId(result.getString("_id"));
             return client;
         }
@@ -151,8 +173,8 @@ public class Client {
 
         if (result != null) {
             Client client = new Client(result.getString("nom"), result.getString("prenom"),
-                    result.getString("adresse"), result.getString("numeroTelephone"),
-                    result.getString("dateNaissance"), result.getString("email"));
+                    result.getString("adresse"), result.getString("telephone"),
+                    result.getString("dateNaissance"), result.getString("email"), Agence.getAgenceById(result.getString("agenceId")));
             client.setId(result.getString("_id"));
             return client;
         }

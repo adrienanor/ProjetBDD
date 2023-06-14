@@ -12,16 +12,16 @@ import java.util.List;
 
 public class Operation {
     private String id;
-    private String clientId;
-    private String compteId;
+    private Client client;
+    private Compte compte;
     private Date date;
     private double montant;
     private String typeOperation;
 
     // Constructeur
-    public Operation(String clientId, String compteId, Date date, double montant, String typeOperation) {
-        this.clientId = clientId;
-        this.compteId = compteId;
+    public Operation(Client client, Compte compte, Date date, double montant, String typeOperation) {
+        this.client = client;
+        this.compte = compte;
         this.date = date;
         this.montant = montant;
         this.typeOperation = typeOperation;
@@ -37,20 +37,20 @@ public class Operation {
         this.id = id;
     }
 
-    public String getClientId() {
-        return clientId;
+    public Client getClient() {
+        return client;
     }
 
-    public void setClientId(String clientId) {
-        this.clientId = clientId;
+    public void setClient(Client client) {
+        this.client = client;
     }
 
-    public String getCompteId() {
-        return compteId;
+    public Compte getCompte() {
+        return compte;
     }
 
-    public void setCompteId(String compteId) {
-        this.compteId = compteId;
+    public void setCompte(Compte compte) {
+        this.compte = compte;
     }
 
     public Date getDate() {
@@ -84,8 +84,8 @@ public class Operation {
         MongoCollection<Document> collection = database.getCollection("Operations");
 
         Document document = new Document();
-        document.append("clientId", this.clientId);
-        document.append("compteId", this.compteId);
+        document.append("clientId", this.client.getId());
+        document.append("compteId", this.compte.getId());
         document.append("date", this.date);
         document.append("montant", this.montant);
         document.append("typeOperation", this.typeOperation);
@@ -99,8 +99,8 @@ public class Operation {
 
         Document filter = new Document("_id", this.id);
         Document update = new Document("$set", new Document()
-                .append("clientId", this.clientId)
-                .append("compteId", this.compteId)
+                .append("clientId", this.client.getId())
+                .append("compteId", this.compte.getId())
                 .append("date", this.date)
                 .append("typeOperation", this.typeOperation)
                 .append("montant", this.montant));
@@ -126,7 +126,7 @@ public class Operation {
         Document result = collection.find(filter).first();
 
         if (result != null) {
-            Operation operation = new Operation(result.getString("clientId"), result.getString("compteId"),
+            Operation operation = new Operation(Client.getClientById(result.getString("client")), Compte.getCompteById(result.getString("compte")),
                     result.getDate("date"), result.getDouble("montant"), result.getString("typeOperation"));
             operation.setId(result.getString("_id"));
             return operation;
@@ -143,7 +143,7 @@ public class Operation {
         List<Operation> operations = new ArrayList<>();
 
         collection.find(filter).forEach((Block<? super Document>) (Document document) -> {
-            Operation operation = new Operation(document.getString("clientId"), document.getString("compteId"),
+            Operation operation = new Operation(Client.getClientById(document.getString("client")), Compte.getCompteById(document.getString("compte")),
                     document.getDate("date"), document.getDouble("montant"), document.getString("typeOperation"));
             operation.setId(document.getString("_id"));
             operations.add(operation);

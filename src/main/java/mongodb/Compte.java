@@ -10,15 +10,15 @@ import java.util.List;
 
 public class Compte {
     private String id;
-    private String clientId;
+    private Client client;
     private String IBAN;
     private String BIC;
     private String typeCompte;
     private double solde;
 
     // Constructeur
-    public Compte(String clientId, String typeCompte, double solde, String IBAN, String BIC) {
-        this.clientId = clientId;
+    public Compte(Client client, String typeCompte, double solde, String IBAN, String BIC) {
+        this.client = client;
         this.typeCompte = typeCompte;
         this.solde = solde;
         this.IBAN = IBAN;
@@ -35,12 +35,12 @@ public class Compte {
         this.id = id;
     }
 
-    public String getClientId() {
-        return clientId;
+    public Client getClient() {
+        return client;
     }
 
-    public void setClientId(String clientId) {
-        this.clientId = clientId;
+    public void setClient(Client client) {
+        this.client = client;
     }
 
     public String getTypeCompte() {
@@ -82,7 +82,7 @@ public class Compte {
         MongoCollection<Document> collection = database.getCollection("Comptes");
 
         Document document = new Document();
-        document.append("clientId", this.clientId);
+        document.append("clientId", this.client.getId());
         document.append("typeCompte", this.typeCompte);
         document.append("solde", this.solde);
         document.append("IBAN", this.IBAN);
@@ -97,7 +97,7 @@ public class Compte {
 
         Document filter = new Document("_id", this.id);
         Document update = new Document("$set", new Document()
-                .append("clientId", this.clientId)
+                .append("clientId", this.client.getId())
                 .append("typeCompte", this.typeCompte)
                 .append("IBAN", this.IBAN)
                 .append("BIC", this.BIC)
@@ -124,7 +124,7 @@ public class Compte {
         Document result = collection.find(filter).first();
 
         if (result != null) {
-            Compte compte = new Compte(result.getString("clientId"),
+            Compte compte = new Compte(Client.getClientById(result.getString("clientId")),
                     result.getString("typeCompte"), result.getDouble("solde"), result.getString("IBAN"), result.getString("BIC"));
             compte.setId(result.getString("_id"));
             return compte;

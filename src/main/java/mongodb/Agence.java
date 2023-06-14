@@ -22,7 +22,7 @@ public class Agence {
         this.adresse = adresse;
         this.telephone = telephone;
         this.email = email;
-        employes = new ArrayList<>();
+        employes = new ArrayList<Employe>();
     }
 
     // Getters et setters pour toutes les propriétés
@@ -86,7 +86,6 @@ public class Agence {
         document.append("adresse", this.adresse);
         document.append("telephone", this.telephone);
         document.append("email", this.email);
-        document.append("employes", this.employes);
 
         collection.insertOne(document);
     }

@@ -20,11 +20,10 @@ public class Employe {
     private String dateNaissance;
     private String dateEmbauche;
     private double salaire;
-
     private Agence agence;
 
     // Constructeur
-    public Employe(String nom, String prenom, String adresse, String telephone, String email, String dateNaissance, String dateEmbauche, double salaire) {
+    public Employe(String nom, String prenom, String adresse, String telephone, String email, String dateNaissance, String dateEmbauche, double salaire, Agence agence) {
         this.nom = nom;
         this.prenom = prenom;
         this.adresse = adresse;
@@ -33,6 +32,7 @@ public class Employe {
         this.dateNaissance = dateNaissance;
         this.dateEmbauche = dateEmbauche;
         this.salaire = salaire;
+        this.agence = agence;
     }
 
     // Getters et setters pour toutes les propriétés
@@ -174,7 +174,7 @@ public class Employe {
         if (result != null) {
             Employe employe = new Employe(result.getString("nom"), result.getString("prenom"),
                     result.getString("adresse"), result.getString("telephone"), result.getString("email"),
-                    result.getString("dateNaissance"), result.getString("dateEmbauche"), result.getDouble("salaire"));
+                    result.getString("dateNaissance"), result.getString("dateEmbauche"), result.getDouble("salaire"), Agence.getAgenceById(result.getString("agence")));
             employe.setId(result.getString("_id"));
             return employe;
         }
