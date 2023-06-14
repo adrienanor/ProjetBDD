@@ -26,13 +26,14 @@ public class Client {
         this.telephone = telephone;
         this.dateNaissance = dateNaissance;
         this.email = email;
-        this.comptes = new ArrayList<Compte>();
+        this.comptes = new ArrayList<>();
         this.agence = agence;
     }
 
     // Getters et setters pour toutes les propriétés
+
     public String getId() {
-        return id;
+        return this.id;
     }
 
     public void setId(String id) {
@@ -63,11 +64,11 @@ public class Client {
         this.adresse = adresse;
     }
 
-    public String gettelephone() {
+    public String getTelephone() {
         return telephone;
     }
 
-    public void settelephone(String telephone) {
+    public void setTelephone(String telephone) {
         this.telephone = telephone;
     }
 
@@ -106,28 +107,30 @@ public class Client {
     // Méthodes CRUD
     public void insertClient(Driver driver) {
         try (Session session = driver.session()) {
-            String query = "CREATE (c:Client {nom: $nom, prenom: $prenom, adresse: $adresse, telephone: $telephone, dateNaissance: $dateNaissance, email: $email}) RETURN c.id AS id";
+            String query = "CREATE (c:Client {nom: $nom, prenom: $prenom, adresse: $adresse, telephone: $telephone, dateNaissance: $dateNaissance, email: $email, agence: $agence}) RETURN c";
             Value parameters = Values.parameters(
                     "nom", this.nom,
                     "prenom", this.prenom,
                     "adresse", this.adresse,
                     "telephone", this.telephone,
                     "dateNaissance", this.dateNaissance,
-                    "email", this.email
+                    "email", this.email,
+                    "agence", this.agence.getId()
             );
 
             Result result = session.run(query, parameters);
             if (result.hasNext()) {
                 Record record = result.next();
-                this.id = record.get("id").asString();
+                Node createdNode = record.get("c").asNode();
+                String clientId = String.valueOf(createdNode.id());
+                this.setId(clientId);
             }
         }
     }
 
     public void updateClient(Driver driver) {
         try (Session session = driver.session()) {
-            String query = "MATCH (c:Client) WHERE c.id = $id " +
-                    "SET c.nom = $nom, c.prenom = $prenom, c.adresse = $adresse, c.telephone = $telephone, c.dateNaissance = $dateNaissance, c.email = $email";
+            String query = "MATCH (c:Client) WHERE ID(c) = " + this.id + " SET c.nom = $nom, c.prenom = $prenom, c.adresse = $adresse, c.telephone = $telephone, c.dateNaissance = $dateNaissance, c.email = $email";
             Value parameters = Values.parameters(
                     "id", this.id,
                     "nom", this.nom,
@@ -144,7 +147,7 @@ public class Client {
 
     public void deleteClient(Driver driver) {
         try (Session session = driver.session()) {
-            String query = "MATCH (c:Client) WHERE c.id = $id DETACH DELETE c";
+            String query = "MATCH (c:Client) WHERE ID(c) = " + this.id + " DETACH DELETE c";
             Value parameters = Values.parameters("id", this.id);
 
             session.run(query, parameters);
@@ -153,8 +156,8 @@ public class Client {
 
     public static Client getClientById(Driver driver, String clientId) {
         try (Session session = driver.session()) {
-            String query = "MATCH (c:Client) WHERE c.id = $id RETURN c";
-            Value parameters = Values.parameters("id", clientId);
+            String query = "MATCH (c:Client) WHERE ID(c) = " + clientId + " RETURN c";
+            Value parameters = Values.parameters("id", Long.parseLong(clientId));
 
             Result result = session.run(query, parameters);
             if (result.hasNext()) {
@@ -170,6 +173,7 @@ public class Client {
                         clientNode.get("email").asString(),
                         Agence.getAgenceById(driver, clientNode.get("agence").asString())
                 );
+
                 client.setId(clientId);
                 return client;
             }
@@ -197,7 +201,7 @@ public class Client {
                         clientNode.get("email").asString(),
                         Agence.getAgenceById(driver, clientNode.get("agence").asString())
                 );
-                client.setId(clientNode.get("id").asString());
+                client.setId(String.valueOf(clientNode.id()));
                 return client;
             }
         }
@@ -230,7 +234,7 @@ public class Client {
                         clientNode.get("email").asString(),
                         Agence.getAgenceById(driver, clientNode.get("agence").asString())
                 );
-                client.setId(clientNode.get("id").asString());
+                client.setId(String.valueOf(clientNode.id()));
 
                 // Vous pouvez traiter les comptes ici et les ajouter au client si nécessaire
                 clientsWithComptes.add(client);
@@ -285,9 +289,9 @@ public class Client {
                         clientNode.get("telephone").asString(),
                         clientNode.get("dateNaissance").asString(),
                         clientNode.get("email").asString(),
-                        Agence.getAgenceById(driver ,clientNode.get("agence").asString())
+                        Agence.getAgenceById(driver, clientNode.get("agence").asString())
                 );
-                client.setId(clientNode.get("id").asString());
+                client.setId(String.valueOf(clientNode.id()));
 
                 clientsSortedByNom.add(client);
             }
@@ -297,6 +301,4 @@ public class Client {
     }
 
     // Méthodes utilitaires
-
-
 }
