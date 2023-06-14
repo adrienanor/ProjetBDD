@@ -97,8 +97,8 @@ public class Operation {
         MongoCollection<Document> collection = database.getCollection("operation");
 
         Document document = new Document();
-        document.append("clientId", this.client.getId());
-        document.append("compteId", this.compte.getId());
+        document.append("client", new ObjectId(this.client.getId()));
+        document.append("compte", new ObjectId(this.compte.getId()));
         document.append("date", this.date);
         document.append("montant", this.montant);
         document.append("typeOperation", this.typeOperation);
