@@ -6,9 +6,12 @@ import com.mongodb.client.*;
 import com.mongodb.client.model.*;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.bson.types.ObjectId;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.mongodb.client.model.Filters.eq;
 
 public class Agence {
     private String id;
@@ -88,7 +91,7 @@ public class Agence {
 
         MongoClient client = MongoClients.create(settings);
         MongoDatabase database = client.getDatabase("projetBDD");
-        MongoCollection<Document> collection = database.getCollection("Agences");
+        MongoCollection<Document> collection = database.getCollection("agence");
 
         Document document = new Document();
         document.append("nom", this.nom);
@@ -97,6 +100,8 @@ public class Agence {
         document.append("email", this.email);
 
         collection.insertOne(document);
+
+        this.setId(document.getObjectId("_id").toString());
     }
 
     public void updateAgence() {
@@ -150,13 +155,12 @@ public class Agence {
         MongoDatabase database = client.getDatabase("projetBDD");
         MongoCollection<Document> collection = database.getCollection("agence");
 
-        Document filter = new Document("_id", agenceId);
-        Document result = collection.find(filter).first();
+        Document result = collection.find(eq("_id", new ObjectId(agenceId))).first();
 
         if (result != null) {
             Agence agence = new Agence(result.getString("nom"), result.getString("adresse"),
                     result.getString("telephone"), result.getString("email"));
-            agence.setId(result.getString("_id"));
+            agence.setId(result.getObjectId("_id").toString());
             return agence;
         }
 
@@ -263,7 +267,7 @@ public class Agence {
         MongoDatabase database = client.getDatabase("projetBDD");
         MongoCollection<Document> collection = database.getCollection("agence");
 
-        Bson filter = Filters.eq("nom", oldName);
+        Bson filter = eq("nom", oldName);
         Bson update = Updates.set("nom", newName);
 
         collection.updateMany(filter, update);
