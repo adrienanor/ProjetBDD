@@ -95,7 +95,7 @@ public class Compte {
         MongoCollection<Document> collection = database.getCollection("compte");
 
         Document document = new Document();
-        document.append("clientId", this.client.getId());
+        document.append("clientId", new ObjectId(this.client.getId()));
         document.append("typeCompte", this.typeCompte);
         document.append("solde", this.solde);
         document.append("IBAN", this.IBAN);
@@ -162,7 +162,7 @@ public class Compte {
         Document result = collection.find(eq("_id", new ObjectId(compteId))).first();
 
         if (result != null) {
-            Compte compte = new Compte(Client.getClientById(result.getString("clientId")),
+            Compte compte = new Compte(Client.getClientById(result.getObjectId("clientId").toString()),
                     result.getString("typeCompte"), result.getDouble("solde"), result.getString("IBAN"), result.getString("BIC"));
             compte.setId(result.getObjectId("_id").toString());
             return compte;

@@ -6,9 +6,12 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.model.*;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.bson.types.ObjectId;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.mongodb.client.model.Filters.eq;
 
 public class Employe {
     private String id;
@@ -140,6 +143,7 @@ public class Employe {
         document.append("dateNaissance", this.dateNaissance);
         document.append("dateEmbauche", this.dateEmbauche);
         document.append("salaire", this.salaire);
+        document.append("agence", new ObjectId(this.agence.getId()));
 
         collection.insertOne(document);
 
@@ -202,13 +206,12 @@ public class Employe {
         MongoDatabase database = client.getDatabase("projetBDD");
         MongoCollection<Document> collection = database.getCollection("employe");
 
-        Document filter = new Document("_id", employeId);
-        Document result = collection.find(filter).first();
+        Document result = collection.find(eq("_id", new ObjectId(employeId))).first();
 
         if (result != null) {
             Employe employe = new Employe(result.getString("nom"), result.getString("prenom"),
                     result.getString("adresse"), result.getString("telephone"), result.getString("email"),
-                    result.getString("dateNaissance"), result.getString("dateEmbauche"), result.getDouble("salaire"), Agence.getAgenceById(result.getString("agence")));
+                    result.getString("dateNaissance"), result.getString("dateEmbauche"), result.getDouble("salaire"), Agence.getAgenceById(result.getObjectId("agence").toString()));
             employe.setId(result.getObjectId("_id").toString());
             return employe;
         }

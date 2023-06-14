@@ -7,10 +7,13 @@ import com.mongodb.client.*;
 import com.mongodb.client.model.*;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.bson.types.ObjectId;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import static com.mongodb.client.model.Filters.eq;
 
 public class Operation {
     private String id;
@@ -158,11 +161,10 @@ public class Operation {
         MongoDatabase database = client.getDatabase("projetBDD");
         MongoCollection<Document> collection = database.getCollection("operation");
 
-        Document filter = new Document("_id", operationId);
-        Document result = collection.find(filter).first();
+        Document result = collection.find(eq("_id", new ObjectId(operationId))).first();
 
         if (result != null) {
-            Operation operation = new Operation(Client.getClientById(result.getString("client")), Compte.getCompteById(result.getString("compte")),
+            Operation operation = new Operation(Client.getClientById(result.getObjectId("client").toString()), Compte.getCompteById(result.getObjectId("compte").toString()),
                     result.getDate("date"), result.getDouble("montant"), result.getString("typeOperation"));
             operation.setId(result.getObjectId("_id").toString());
             return operation;

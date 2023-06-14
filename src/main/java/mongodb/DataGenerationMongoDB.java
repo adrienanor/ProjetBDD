@@ -13,6 +13,7 @@ import org.bson.types.ObjectId;
 
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -24,6 +25,8 @@ public class DataGenerationMongoDB {
     private static final String AGENCES_CSV_PATH = "src/main/resources/agence.csv";
     private static final String EMPLOYES_CSV_PATH = "src/main/resources/employe.csv";
 
+    private static final String[] toObjectId = new String[] {"_id", "client", "compte", "agence"};
+
     private static void insertDataFromCSV(String filename, MongoCollection<Document> collection) {
         try (CSVParser csvParser = new CSVParser(new FileReader(filename), CSVFormat.DEFAULT.withHeader())) {
             List<Document> documents = new ArrayList<>();
@@ -33,7 +36,7 @@ public class DataGenerationMongoDB {
                 for (String header : csvParser.getHeaderMap().keySet()) {
                     String value = record.get(header);
 
-                    if (Objects.equals(header, "_id"))
+                    if (Arrays.asList(toObjectId).contains(header))
                         document.append(header, new ObjectId(value));
                     else
                         document.append(header, value);
