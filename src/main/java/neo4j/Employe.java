@@ -205,66 +205,66 @@ public class Employe {
     // Méthodes applicatives de consultation
 
     // Jointure
-    public static List<Pair<Employe, Agence>> getEmployesWithAgence(Driver driver) {
-        try (Session session = driver.session()) {
-            String query = "MATCH (e:Employe)-[:TRAVAILLE_DANS]->(a:Agence) RETURN e, a";
-            Result result = session.run(query);
-
-            List<Pair<Employe, Agence>> employesWithAgences = new ArrayList<>();
-            while (result.hasNext()) {
-                Record record = result.next();
-                Node employeNode = record.get("e").asNode();
-                Node agenceNode = record.get("a").asNode();
-
-                Employe employe = new Employe(
-                        employeNode.get("nom").asString(),
-                        employeNode.get("prenom").asString(),
-                        employeNode.get("adresse").asString(),
-                        employeNode.get("telephone").asString(),
-                        employeNode.get("email").asString(),
-                        employeNode.get("dateNaissance").asString(),
-                        employeNode.get("dateEmbauche").asString(),
-                        employeNode.get("salaire").asDouble()
-                );
-                employe.setId(employeNode.get("id").asString());
-
-                Agence agence = new Agence(
-                        agenceNode.get("nom").asString(),
-                        agenceNode.get("adresse").asString(),
-                        agenceNode.get("telephone").asString(),
-                        agenceNode.get("email").asString()
-                );
-                agence.setId(agenceNode.get("id").asString());
-
-                employe.setAgence(agence);
-                employesWithAgences.add(new Pair<>(employe, agence));
-            }
-
-            return employesWithAgences;
-        }
-    }
-
-    // Groupement
-    public static List<Pair<Double, Integer>> getEmployesBySalaireRange(Driver driver, double minSalaire, double maxSalaire) {
-        try (Session session = driver.session()) {
-            String query = "MATCH (e:Employe) WHERE e.salaire >= $minSalaire AND e.salaire <= $maxSalaire RETURN e.salaire AS salaire, count(*) AS count";
-            Value parameters = Values.parameters(
-                    "minSalaire", minSalaire,
-                    "maxSalaire", maxSalaire
-            );
-            Result result = session.run(query, parameters);
-
-            List<Pair<Double, Integer>> employesBySalaireRange = new ArrayList<>();
-            while (result.hasNext()) {
-                Record record = result.next();
-                double salaire = record.get("salaire").asDouble();
-                int count = record.get("count").asInt();
-                employesBySalaireRange.add(new Pair<>(salaire, count));
-            }
-
-            return employesBySalaireRange;
-        }
-    }
+//    public static List<Pair<Employe, Agence>> getEmployesWithAgence(Driver driver) {
+//        try (Session session = driver.session()) {
+//            String query = "MATCH (e:Employe)-[:TRAVAILLE_DANS]->(a:Agence) RETURN e, a";
+//            Result result = session.run(query);
+//
+//            List<Pair<Employe, Agence>> employesWithAgences = new ArrayList<>();
+//            while (result.hasNext()) {
+//                Record record = result.next();
+//                Node employeNode = record.get("e").asNode();
+//                Node agenceNode = record.get("a").asNode();
+//
+//                Employe employe = new Employe(
+//                        employeNode.get("nom").asString(),
+//                        employeNode.get("prenom").asString(),
+//                        employeNode.get("adresse").asString(),
+//                        employeNode.get("telephone").asString(),
+//                        employeNode.get("email").asString(),
+//                        employeNode.get("dateNaissance").asString(),
+//                        employeNode.get("dateEmbauche").asString(),
+//                        employeNode.get("salaire").asDouble()
+//                );
+//                employe.setId(employeNode.get("id").asString());
+//
+//                Agence agence = new Agence(
+//                        agenceNode.get("nom").asString(),
+//                        agenceNode.get("adresse").asString(),
+//                        agenceNode.get("telephone").asString(),
+//                        agenceNode.get("email").asString()
+//                );
+//                agence.setId(agenceNode.get("id").asString());
+//
+//                employe.setAgence(agence);
+//                employesWithAgences.add(new Pair<>(employe, agence));
+//            }
+//
+//            return employesWithAgences;
+//        }
+//    }
+//
+//    // Groupement
+//    public static List<Pair<Double, Integer>> getEmployesBySalaireRange(Driver driver, double minSalaire, double maxSalaire) {
+//        try (Session session = driver.session()) {
+//            String query = "MATCH (e:Employe) WHERE e.salaire >= $minSalaire AND e.salaire <= $maxSalaire RETURN e.salaire AS salaire, count(*) AS count";
+//            Value parameters = Values.parameters(
+//                    "minSalaire", minSalaire,
+//                    "maxSalaire", maxSalaire
+//            );
+//            Result result = session.run(query, parameters);
+//
+//            List<Pair<Double, Integer>> employesBySalaireRange = new ArrayList<>();
+//            while (result.hasNext()) {
+//                Record record = result.next();
+//                double salaire = record.get("salaire").asDouble();
+//                int count = record.get("count").asInt();
+//                employesBySalaireRange.add(new Pair<>(salaire, count));
+//            }
+//
+//            return employesBySalaireRange;
+//        }
+//    }
 
     // Tri
     public static List<Employe> getEmployesSortedByNom(Driver driver) {

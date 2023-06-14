@@ -120,8 +120,16 @@ public class Employe {
     // Méthodes CRUD
 
     public void insertEmploye() {
-        MongoDatabase database = MongoClients.create().getDatabase("your_database_name");
-        MongoCollection<Document> collection = database.getCollection("Employes");
+        ConnectionString connectionString = new ConnectionString("mongodb+srv://projetbddadmin:projetbddadmin@projetbdd.qhobbmh.mongodb.net/?retryWrites=true&w=majority");
+
+        MongoClientSettings settings = MongoClientSettings.builder()
+                .applyConnectionString(connectionString)
+                .retryWrites(true)
+                .build();
+
+        MongoClient client = MongoClients.create(settings);
+        MongoDatabase database = client.getDatabase("projetBDD");
+        MongoCollection<Document> collection = database.getCollection("employe");
 
         Document document = new Document();
         document.append("nom", this.nom);
@@ -137,8 +145,16 @@ public class Employe {
     }
 
     public void updateEmploye() {
-        MongoDatabase database = MongoClients.create().getDatabase("your_database_name");
-        MongoCollection<Document> collection = database.getCollection("Employes");
+        ConnectionString connectionString = new ConnectionString("mongodb+srv://projetbddadmin:projetbddadmin@projetbdd.qhobbmh.mongodb.net/?retryWrites=true&w=majority");
+
+        MongoClientSettings settings = MongoClientSettings.builder()
+                .applyConnectionString(connectionString)
+                .retryWrites(true)
+                .build();
+
+        MongoClient client = MongoClients.create(settings);
+        MongoDatabase database = client.getDatabase("projetBDD");
+        MongoCollection<Document> collection = database.getCollection("employe");
 
         Document filter = new Document("_id", this.id);
         Document update = new Document("$set", new Document()
@@ -155,8 +171,16 @@ public class Employe {
     }
 
     public void deleteEmploye() {
-        MongoDatabase database = MongoClients.create().getDatabase("your_database_name");
-        MongoCollection<Document> collection = database.getCollection("Employes");
+        ConnectionString connectionString = new ConnectionString("mongodb+srv://projetbddadmin:projetbddadmin@projetbdd.qhobbmh.mongodb.net/?retryWrites=true&w=majority");
+
+        MongoClientSettings settings = MongoClientSettings.builder()
+                .applyConnectionString(connectionString)
+                .retryWrites(true)
+                .build();
+
+        MongoClient client = MongoClients.create(settings);
+        MongoDatabase database = client.getDatabase("projetBDD");
+        MongoCollection<Document> collection = database.getCollection("employe");
 
         Document filter = new Document("_id", this.id);
         collection.deleteOne(filter);
@@ -165,8 +189,16 @@ public class Employe {
     // Méthodes de recherche et de récupération d'employés
 
     public static Employe getEmployeById(String employeId) {
-        MongoDatabase database = MongoClients.create().getDatabase("your_database_name");
-        MongoCollection<Document> collection = database.getCollection("Employes");
+        ConnectionString connectionString = new ConnectionString("mongodb+srv://projetbddadmin:projetbddadmin@projetbdd.qhobbmh.mongodb.net/?retryWrites=true&w=majority");
+
+        MongoClientSettings settings = MongoClientSettings.builder()
+                .applyConnectionString(connectionString)
+                .retryWrites(true)
+                .build();
+
+        MongoClient client = MongoClients.create(settings);
+        MongoDatabase database = client.getDatabase("projetBDD");
+        MongoCollection<Document> collection = database.getCollection("employe");
 
         Document filter = new Document("_id", employeId);
         Document result = collection.find(filter).first();
@@ -184,8 +216,16 @@ public class Employe {
 
     // Méthode pour créer un index secondaire sur le champ "email"
     public static void createEmailIndex() {
-        MongoDatabase database = MongoClients.create().getDatabase("your_database_name");
-        MongoCollection<Document> collection = database.getCollection("Employes");
+        ConnectionString connectionString = new ConnectionString("mongodb+srv://projetbddadmin:projetbddadmin@projetbdd.qhobbmh.mongodb.net/?retryWrites=true&w=majority");
+
+        MongoClientSettings settings = MongoClientSettings.builder()
+                .applyConnectionString(connectionString)
+                .retryWrites(true)
+                .build();
+
+        MongoClient client = MongoClients.create(settings);
+        MongoDatabase database = client.getDatabase("projetBDD");
+        MongoCollection<Document> collection = database.getCollection("employe");
 
         IndexOptions indexOptions = new IndexOptions().unique(true);
         collection.createIndex(new Document("email", 1), indexOptions);
@@ -195,9 +235,17 @@ public class Employe {
 
     // Jointure
     public static List<Document> getEmployesWithClients() {
-        MongoDatabase database = MongoClients.create().getDatabase("your_database_name");
-        MongoCollection<Document> employesCollection = database.getCollection("Employes");
-        MongoCollection<Document> clientsCollection = database.getCollection("Clients");
+        ConnectionString connectionString = new ConnectionString("mongodb+srv://projetbddadmin:projetbddadmin@projetbdd.qhobbmh.mongodb.net/?retryWrites=true&w=majority");
+
+        MongoClientSettings settings = MongoClientSettings.builder()
+                .applyConnectionString(connectionString)
+                .retryWrites(true)
+                .build();
+
+        MongoClient client = MongoClients.create(settings);
+        MongoDatabase database = client.getDatabase("projetBDD");
+        MongoCollection<Document> employesCollection = database.getCollection("employe");
+        MongoCollection<Document> clientsCollection = database.getCollection("client");
 
         List<Document> employesWithClients = new ArrayList<>();
 
@@ -206,8 +254,8 @@ public class Employe {
             Document employe = employesCursor.next();
             String employeId = employe.getString("_id");
 
-            Document client = clientsCollection.find(new Document("employeId", employeId)).first();
-            employe.append("client", client);
+            Document clientDoc = clientsCollection.find(new Document("employeId", employeId)).first();
+            employe.append("client", clientDoc);
 
             employesWithClients.add(employe);
         }
@@ -217,8 +265,16 @@ public class Employe {
 
     // Groupement
     public static List<Document> getEmployesBySalaireRange(double minSalaire, double maxSalaire) {
-        MongoDatabase database = MongoClients.create().getDatabase("your_database_name");
-        MongoCollection<Document> collection = database.getCollection("Employes");
+        ConnectionString connectionString = new ConnectionString("mongodb+srv://projetbddadmin:projetbddadmin@projetbdd.qhobbmh.mongodb.net/?retryWrites=true&w=majority");
+
+        MongoClientSettings settings = MongoClientSettings.builder()
+                .applyConnectionString(connectionString)
+                .retryWrites(true)
+                .build();
+
+        MongoClient client = MongoClients.create(settings);
+        MongoDatabase database = client.getDatabase("projetBDD");
+        MongoCollection<Document> collection = database.getCollection("employe");
 
         Bson filter = Filters.and(
                 Filters.gte("salaire", minSalaire),
@@ -234,8 +290,16 @@ public class Employe {
 
     // Tri
     public static List<Document> getEmployesSortedByNom() {
-        MongoDatabase database = MongoClients.create().getDatabase("your_database_name");
-        MongoCollection<Document> collection = database.getCollection("Employes");
+        ConnectionString connectionString = new ConnectionString("mongodb+srv://projetbddadmin:projetbddadmin@projetbdd.qhobbmh.mongodb.net/?retryWrites=true&w=majority");
+
+        MongoClientSettings settings = MongoClientSettings.builder()
+                .applyConnectionString(connectionString)
+                .retryWrites(true)
+                .build();
+
+        MongoClient client = MongoClients.create(settings);
+        MongoDatabase database = client.getDatabase("projetBDD");
+        MongoCollection<Document> collection = database.getCollection("employe");
 
         FindIterable<Document> result = collection.find().sort(Sorts.ascending("nom"));
 
@@ -244,9 +308,16 @@ public class Employe {
 
     // Traitement en masse de documents
     public static void updateSalairesInBulk(double percentageIncrease) {
-        MongoClient client = MongoClients.create("mongodb://localhost:27017");
-        MongoDatabase database = client.getDatabase("your_database_name");
-        MongoCollection<Document> collection = database.getCollection("Employes");
+        ConnectionString connectionString = new ConnectionString("mongodb+srv://projetbddadmin:projetbddadmin@projetbdd.qhobbmh.mongodb.net/?retryWrites=true&w=majority");
+
+        MongoClientSettings settings = MongoClientSettings.builder()
+                .applyConnectionString(connectionString)
+                .retryWrites(true)
+                .build();
+
+        MongoClient client = MongoClients.create(settings);
+        MongoDatabase database = client.getDatabase("projetBDD");
+        MongoCollection<Document> collection = database.getCollection("employe");
 
         List<WriteModel<Document>> bulkOperations = new ArrayList<>();
 

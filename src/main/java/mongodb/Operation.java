@@ -1,6 +1,8 @@
 package mongodb;
 
 import com.mongodb.Block;
+import com.mongodb.ConnectionString;
+import com.mongodb.MongoClientSettings;
 import com.mongodb.client.*;
 import com.mongodb.client.model.*;
 import org.bson.Document;
@@ -80,8 +82,16 @@ public class Operation {
     // Méthodes CRUD
 
     public void insertOperation() {
-        MongoDatabase database = MongoClients.create().getDatabase("your_database_name");
-        MongoCollection<Document> collection = database.getCollection("Operations");
+        ConnectionString connectionString = new ConnectionString("mongodb+srv://projetbddadmin:projetbddadmin@projetbdd.qhobbmh.mongodb.net/?retryWrites=true&w=majority");
+
+        MongoClientSettings settings = MongoClientSettings.builder()
+                .applyConnectionString(connectionString)
+                .retryWrites(true)
+                .build();
+
+        MongoClient client = MongoClients.create(settings);
+        MongoDatabase database = client.getDatabase("projetBDD");
+        MongoCollection<Document> collection = database.getCollection("operation");
 
         Document document = new Document();
         document.append("clientId", this.client.getId());
@@ -94,8 +104,16 @@ public class Operation {
     }
 
     public void updateOperation() {
-        MongoDatabase database = MongoClients.create().getDatabase("your_database_name");
-        MongoCollection<Document> collection = database.getCollection("Operations");
+        ConnectionString connectionString = new ConnectionString("mongodb+srv://projetbddadmin:projetbddadmin@projetbdd.qhobbmh.mongodb.net/?retryWrites=true&w=majority");
+
+        MongoClientSettings settings = MongoClientSettings.builder()
+                .applyConnectionString(connectionString)
+                .retryWrites(true)
+                .build();
+
+        MongoClient client = MongoClients.create(settings);
+        MongoDatabase database = client.getDatabase("projetBDD");
+        MongoCollection<Document> collection = database.getCollection("operation");
 
         Document filter = new Document("_id", this.id);
         Document update = new Document("$set", new Document()
@@ -109,8 +127,16 @@ public class Operation {
     }
 
     public void deleteOperation() {
-        MongoDatabase database = MongoClients.create().getDatabase("your_database_name");
-        MongoCollection<Document> collection = database.getCollection("Operations");
+        ConnectionString connectionString = new ConnectionString("mongodb+srv://projetbddadmin:projetbddadmin@projetbdd.qhobbmh.mongodb.net/?retryWrites=true&w=majority");
+
+        MongoClientSettings settings = MongoClientSettings.builder()
+                .applyConnectionString(connectionString)
+                .retryWrites(true)
+                .build();
+
+        MongoClient client = MongoClients.create(settings);
+        MongoDatabase database = client.getDatabase("projetBDD");
+        MongoCollection<Document> collection = database.getCollection("operation");
 
         Document filter = new Document("_id", this.id);
         collection.deleteOne(filter);
@@ -119,8 +145,16 @@ public class Operation {
     // Méthodes de recherche et de récupération d'opérations
 
     public static Operation getOperationById(String operationId) {
-        MongoDatabase database = MongoClients.create().getDatabase("your_database_name");
-        MongoCollection<Document> collection = database.getCollection("Operations");
+        ConnectionString connectionString = new ConnectionString("mongodb+srv://projetbddadmin:projetbddadmin@projetbdd.qhobbmh.mongodb.net/?retryWrites=true&w=majority");
+
+        MongoClientSettings settings = MongoClientSettings.builder()
+                .applyConnectionString(connectionString)
+                .retryWrites(true)
+                .build();
+
+        MongoClient client = MongoClients.create(settings);
+        MongoDatabase database = client.getDatabase("projetBDD");
+        MongoCollection<Document> collection = database.getCollection("operation");
 
         Document filter = new Document("_id", operationId);
         Document result = collection.find(filter).first();
@@ -136,8 +170,16 @@ public class Operation {
     }
 
     public static List<Operation> getOperationsByClientId(String clientId) {
-        MongoDatabase database = MongoClients.create().getDatabase("your_database_name");
-        MongoCollection<Document> collection = database.getCollection("Operations");
+        ConnectionString connectionString = new ConnectionString("mongodb+srv://projetbddadmin:projetbddadmin@projetbdd.qhobbmh.mongodb.net/?retryWrites=true&w=majority");
+
+        MongoClientSettings settings = MongoClientSettings.builder()
+                .applyConnectionString(connectionString)
+                .retryWrites(true)
+                .build();
+
+        MongoClient client = MongoClients.create(settings);
+        MongoDatabase database = client.getDatabase("projetBDD");
+        MongoCollection<Document> collection = database.getCollection("operation");
 
         Document filter = new Document("clientId", clientId);
         List<Operation> operations = new ArrayList<>();
@@ -154,8 +196,16 @@ public class Operation {
 
     // Méthode pour créer un index secondaire sur le champ "clientId"
     public static void createClientIdIndex() {
-        MongoDatabase database = MongoClients.create().getDatabase("your_database_name");
-        MongoCollection<Document> collection = database.getCollection("Operations");
+        ConnectionString connectionString = new ConnectionString("mongodb+srv://projetbddadmin:projetbddadmin@projetbdd.qhobbmh.mongodb.net/?retryWrites=true&w=majority");
+
+        MongoClientSettings settings = MongoClientSettings.builder()
+                .applyConnectionString(connectionString)
+                .retryWrites(true)
+                .build();
+
+        MongoClient client = MongoClients.create(settings);
+        MongoDatabase database = client.getDatabase("projetBDD");
+        MongoCollection<Document> collection = database.getCollection("operation");
 
         IndexOptions indexOptions = new IndexOptions().unique(false);
         collection.createIndex(new Document("clientId", 1), indexOptions);
@@ -165,9 +215,17 @@ public class Operation {
 
     // Jointure
     public static List<Document> getOperationsWithClients() {
-        MongoDatabase database = MongoClients.create().getDatabase("your_database_name");
-        MongoCollection<Document> operationsCollection = database.getCollection("Operations");
-        MongoCollection<Document> clientsCollection = database.getCollection("Clients");
+        ConnectionString connectionString = new ConnectionString("mongodb+srv://projetbddadmin:projetbddadmin@projetbdd.qhobbmh.mongodb.net/?retryWrites=true&w=majority");
+
+        MongoClientSettings settings = MongoClientSettings.builder()
+                .applyConnectionString(connectionString)
+                .retryWrites(true)
+                .build();
+
+        MongoClient client = MongoClients.create(settings);
+        MongoDatabase database = client.getDatabase("projetBDD");
+        MongoCollection<Document> operationsCollection = database.getCollection("operation");
+        MongoCollection<Document> clientsCollection = database.getCollection("client");
 
         List<Document> operationsWithClients = new ArrayList<>();
 
@@ -176,8 +234,8 @@ public class Operation {
             Document operation = operationsCursor.next();
             String clientId = operation.getString("clientId");
 
-            Document client = clientsCollection.find(new Document("_id", clientId)).first();
-            operation.append("client", client);
+            Document clientDoc = clientsCollection.find(new Document("_id", clientId)).first();
+            operation.append("client", clientDoc);
 
             operationsWithClients.add(operation);
         }
@@ -187,8 +245,16 @@ public class Operation {
 
     // Groupement
     public static List<Document> getOperationsByType() {
-        MongoDatabase database = MongoClients.create().getDatabase("your_database_name");
-        MongoCollection<Document> collection = database.getCollection("Operations");
+        ConnectionString connectionString = new ConnectionString("mongodb+srv://projetbddadmin:projetbddadmin@projetbdd.qhobbmh.mongodb.net/?retryWrites=true&w=majority");
+
+        MongoClientSettings settings = MongoClientSettings.builder()
+                .applyConnectionString(connectionString)
+                .retryWrites(true)
+                .build();
+
+        MongoClient client = MongoClients.create(settings);
+        MongoDatabase database = client.getDatabase("projetBDD");
+        MongoCollection<Document> collection = database.getCollection("operation");
 
         Bson group = Aggregates.group("$type", Accumulators.sum("count", 1));
 
@@ -200,8 +266,16 @@ public class Operation {
 
     // Tri
     public static List<Document> getOperationsSortedByMontant() {
-        MongoDatabase database = MongoClients.create().getDatabase("your_database_name");
-        MongoCollection<Document> collection = database.getCollection("Operations");
+        ConnectionString connectionString = new ConnectionString("mongodb+srv://projetbddadmin:projetbddadmin@projetbdd.qhobbmh.mongodb.net/?retryWrites=true&w=majority");
+
+        MongoClientSettings settings = MongoClientSettings.builder()
+                .applyConnectionString(connectionString)
+                .retryWrites(true)
+                .build();
+
+        MongoClient client = MongoClients.create(settings);
+        MongoDatabase database = client.getDatabase("projetBDD");
+        MongoCollection<Document> collection = database.getCollection("operation");
 
         FindIterable<Document> result = collection.find().sort(Sorts.descending("montant"));
 
@@ -210,8 +284,16 @@ public class Operation {
 
     // Traitement en masse de documents
     public static void deleteOperationsByClientId(String clientId) {
-        MongoDatabase database = MongoClients.create().getDatabase("your_database_name");
-        MongoCollection<Document> collection = database.getCollection("Operations");
+        ConnectionString connectionString = new ConnectionString("mongodb+srv://projetbddadmin:projetbddadmin@projetbdd.qhobbmh.mongodb.net/?retryWrites=true&w=majority");
+
+        MongoClientSettings settings = MongoClientSettings.builder()
+                .applyConnectionString(connectionString)
+                .retryWrites(true)
+                .build();
+
+        MongoClient client = MongoClients.create(settings);
+        MongoDatabase database = client.getDatabase("projetBDD");
+        MongoCollection<Document> collection = database.getCollection("operation");
 
         Bson filter = Filters.eq("clientId", clientId);
         collection.deleteMany(filter);

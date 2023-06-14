@@ -218,30 +218,30 @@ public class Client {
     }
 
     // Groupement
-    public static List<Client> getClientsByAgeGroup(Driver driver) {
-        try (Session session = driver.session()) {
-            String query = "MATCH (c:Client) RETURN c.ageGroup AS ageGroup, count(*) AS count ORDER BY ageGroup ASC";
-            Result result = session.run(query);
-
-            List<Client> clientsByAgeGroup = new ArrayList<>();
-
-            while (result.hasNext()) {
-                Record record = result.next();
-                String ageGroup = record.get("ageGroup").asString();
-                long count = record.get("count").asLong();
-
-                // Créez un objet Client avec les informations de groupe d'âge et de compte ici
-                Client client = new Client();
-                // Définissez les propriétés du client en fonction des données de groupe d'âge et de compte
-                // client.setAgeGroup(ageGroup);
-                // client.setCount(count);
-
-                clientsByAgeGroup.add(client);
-            }
-
-            return clientsByAgeGroup;
-        }
-    }
+//    public static List<Client> getClientsByAgeGroup(Driver driver) {
+//        try (Session session = driver.session()) {
+//            String query = "MATCH (c:Client) RETURN c.ageGroup AS ageGroup, count(*) AS count ORDER BY ageGroup ASC";
+//            Result result = session.run(query);
+//
+//            List<Client> clientsByAgeGroup = new ArrayList<>();
+//
+//            while (result.hasNext()) {
+//                Record record = result.next();
+//                String ageGroup = record.get("ageGroup").asString();
+//                long count = record.get("count").asLong();
+//
+//                // Créez un objet Client avec les informations de groupe d'âge et de compte ici
+//                Client client = new Client();
+//                // Définissez les propriétés du client en fonction des données de groupe d'âge et de compte
+//                // client.setAgeGroup(ageGroup);
+//                // client.setCount(count);
+//
+//                clientsByAgeGroup.add(client);
+//            }
+//
+//            return clientsByAgeGroup;
+//        }
+//    }
 
     // Tri
     public static List<Client> getClientsSortedByNom(Driver driver) {

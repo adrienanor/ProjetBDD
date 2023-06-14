@@ -1,4 +1,4 @@
-id,client,compte,date,montant,typeOperation
+_id,client,compte,date,montant,typeOperation
 64899a5dfc13ae2d2a9009ab,64899251fc13ae2cc7900ec3,64899668fc13ae29a0900c9b,02/03/2023,"€44669,92",Retrait
 64899a5dfc13ae2d2a9009ac,64899252fc13ae2cc7900f45,64899667fc13ae29a0900a00,09/03/2018,"€20847,90",Prélèvement automatique
 64899a5dfc13ae2d2a9009ad,64899252fc13ae2cc7901077,64899668fc13ae29a0900d6e,09/06/2020,"€4822,81",Prélèvement automatique

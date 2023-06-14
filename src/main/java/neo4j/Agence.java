@@ -138,44 +138,44 @@ public class Agence {
     // Méthodes applicatives de consultation
 
     // Jointure
-    public static List<Agence> getAgencesWithClients(Driver driver) {
-        try (Session session = driver.session()) {
-            String query = "MATCH (a:Agence)-[:EMPLOIE]->(e:Employe)-[:TRAVAILLE_A]->(c:Client) " +
-                    "RETURN a, COLLECT(DISTINCT {nom: e.nom, adresse: c.adresse, telephone: c.telephone, email: c.email}) AS clients";
-            Result result = session.run(query);
-
-            List<Agence> agencesWithClients = new ArrayList<>();
-
-            while (result.hasNext()) {
-                Record record = result.next();
-                Node agenceNode = record.get("a").asNode();
-                List<Value> clientsValues = record.get("clients").asList();
-
-                Agence agence = new Agence(
-                        agenceNode.get("nom").asString(),
-                        agenceNode.get("adresse").asString(),
-                        agenceNode.get("telephone").asString(),
-                        agenceNode.get("email").asString()
-                );
-                agence.setId(agenceNode.get("id").asString());
-
-                for (Value clientValue : clientsValues) {
-                    Node clientNode = clientValue.asNode();
-                    Employe employe = new Employe (
-                            clientNode.get("nom").asString(),
-                            clientNode.get("adresse").asString(),
-                            clientNode.get("telephone").asString(),
-                            clientNode.get("email").asString()
-                    );
-                    agence.addEmploye(employe);
-                }
-
-                agencesWithClients.add(agence);
-            }
-
-            return agencesWithClients;
-        }
-    }
+//    public static List<Agence> getAgencesWithClients(Driver driver) {
+//        try (Session session = driver.session()) {
+//            String query = "MATCH (a:Agence)-[:EMPLOIE]->(e:Employe)-[:TRAVAILLE_A]->(c:Client) " +
+//                    "RETURN a, COLLECT(DISTINCT {nom: e.nom, adresse: c.adresse, telephone: c.telephone, email: c.email}) AS clients";
+//            Result result = session.run(query);
+//
+//            List<Agence> agencesWithClients = new ArrayList<>();
+//
+//            while (result.hasNext()) {
+//                Record record = result.next();
+//                Node agenceNode = record.get("a").asNode();
+//                List<Value> clientsValues = record.get("clients").asList();
+//
+//                Agence agence = new Agence(
+//                        agenceNode.get("nom").asString(),
+//                        agenceNode.get("adresse").asString(),
+//                        agenceNode.get("telephone").asString(),
+//                        agenceNode.get("email").asString()
+//                );
+//                agence.setId(agenceNode.get("id").asString());
+//
+//                for (Value clientValue : clientsValues) {
+//                    Node clientNode = clientValue.asNode();
+//                    Employe employe = new Employe (
+//                            clientNode.get("nom").asString(),
+//                            clientNode.get("adresse").asString(),
+//                            clientNode.get("telephone").asString(),
+//                            clientNode.get("email").asString()
+//                    );
+//                    agence.addEmploye(employe);
+//                }
+//
+//                agencesWithClients.add(agence);
+//            }
+//
+//            return agencesWithClients;
+//        }
+//    }
 
     // Groupement
     public static List<Agence> getAgencesByVille(Driver driver) {
