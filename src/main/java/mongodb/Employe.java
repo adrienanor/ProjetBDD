@@ -14,7 +14,7 @@ import java.util.List;
 import static com.mongodb.client.model.Filters.eq;
 
 public class Employe {
-    private String id;
+    private ObjectId id;
     private String nom;
     private String prenom;
     private String adresse;
@@ -40,11 +40,11 @@ public class Employe {
 
     // Getters et setters pour toutes les propriétés
 
-    public String getId() {
+    public ObjectId getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(ObjectId id) {
         this.id = id;
     }
 
@@ -143,11 +143,11 @@ public class Employe {
         document.append("dateNaissance", this.dateNaissance);
         document.append("dateEmbauche", this.dateEmbauche);
         document.append("salaire", this.salaire);
-        document.append("agence", new ObjectId(this.agence.getId()));
+        document.append("agence", this.agence.getId());
 
         collection.insertOne(document);
 
-        this.setId(document.getObjectId("_id").toString());
+        this.setId(document.getObjectId("_id"));
     }
 
     public void updateEmploye() {
@@ -194,7 +194,7 @@ public class Employe {
 
     // Méthodes de recherche et de récupération d'employés
 
-    public static Employe getEmployeById(String employeId) {
+    public static Employe getEmployeById(ObjectId employeId) {
         ConnectionString connectionString = new ConnectionString("mongodb+srv://projetbddadmin:projetbddadmin@projetbdd.qhobbmh.mongodb.net/?retryWrites=true&w=majority");
 
         MongoClientSettings settings = MongoClientSettings.builder()
@@ -206,13 +206,13 @@ public class Employe {
         MongoDatabase database = client.getDatabase("projetBDD");
         MongoCollection<Document> collection = database.getCollection("employe");
 
-        Document result = collection.find(eq("_id", new ObjectId(employeId))).first();
+        Document result = collection.find(eq("_id", employeId)).first();
 
         if (result != null) {
             Employe employe = new Employe(result.getString("nom"), result.getString("prenom"),
                     result.getString("adresse"), result.getString("telephone"), result.getString("email"),
-                    result.getString("dateNaissance"), result.getString("dateEmbauche"), result.getDouble("salaire"), Agence.getAgenceById(result.getObjectId("agence").toString()));
-            employe.setId(result.getObjectId("_id").toString());
+                    result.getString("dateNaissance"), result.getString("dateEmbauche"), result.getDouble("salaire"), Agence.getAgenceById(result.getObjectId("agence")));
+            employe.setId(result.getObjectId("_id"));
             return employe;
         }
 

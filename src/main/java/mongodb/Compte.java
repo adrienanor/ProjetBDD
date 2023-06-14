@@ -14,7 +14,7 @@ import java.util.List;
 import static com.mongodb.client.model.Filters.eq;
 
 public class Compte {
-    private String id;
+    private ObjectId id;
     private Client client;
     private String IBAN;
     private String BIC;
@@ -32,11 +32,11 @@ public class Compte {
 
     // Getters et setters pour toutes les propriétés
 
-    public String getId() {
+    public ObjectId getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(ObjectId id) {
         this.id = id;
     }
 
@@ -95,7 +95,7 @@ public class Compte {
         MongoCollection<Document> collection = database.getCollection("compte");
 
         Document document = new Document();
-        document.append("clientId", new ObjectId(this.client.getId()));
+        document.append("clientId", this.client.getId());
         document.append("typeCompte", this.typeCompte);
         document.append("solde", this.solde);
         document.append("IBAN", this.IBAN);
@@ -103,7 +103,7 @@ public class Compte {
 
         collection.insertOne(document);
 
-        this.setId(document.getObjectId("_id").toString());
+        this.setId(document.getObjectId("_id"));
     }
 
     public void updateCompte() {
@@ -147,7 +147,7 @@ public class Compte {
 
     // Méthodes de recherche et de récupération de comptes
 
-    public static Compte getCompteById(String compteId) {
+    public static Compte getCompteById(ObjectId compteId) {
         ConnectionString connectionString = new ConnectionString("mongodb+srv://projetbddadmin:projetbddadmin@projetbdd.qhobbmh.mongodb.net/?retryWrites=true&w=majority");
 
         MongoClientSettings settings = MongoClientSettings.builder()
@@ -159,12 +159,12 @@ public class Compte {
         MongoDatabase database = client.getDatabase("projetBDD");
         MongoCollection<Document> collection = database.getCollection("compte");
 
-        Document result = collection.find(eq("_id", new ObjectId(compteId))).first();
+        Document result = collection.find(eq("_id", compteId)).first();
 
         if (result != null) {
-            Compte compte = new Compte(Client.getClientById(result.getObjectId("clientId").toString()),
+            Compte compte = new Compte(Client.getClientById(result.getObjectId("clientId")),
                     result.getString("typeCompte"), result.getDouble("solde"), result.getString("IBAN"), result.getString("BIC"));
-            compte.setId(result.getObjectId("_id").toString());
+            compte.setId(result.getObjectId("_id"));
             return compte;
         }
 

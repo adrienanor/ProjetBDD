@@ -16,7 +16,7 @@ import java.util.List;
 import static com.mongodb.client.model.Filters.eq;
 
 public class Operation {
-    private String id;
+    private ObjectId id;
     private Client client;
     private Compte compte;
     private Date date;
@@ -34,11 +34,11 @@ public class Operation {
 
     // Getters et setters pour toutes les propriétés
 
-    public String getId() {
+    public ObjectId getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(ObjectId id) {
         this.id = id;
     }
 
@@ -97,15 +97,15 @@ public class Operation {
         MongoCollection<Document> collection = database.getCollection("operation");
 
         Document document = new Document();
-        document.append("client", new ObjectId(this.client.getId()));
-        document.append("compte", new ObjectId(this.compte.getId()));
+        document.append("client", this.client.getId());
+        document.append("compte", this.compte.getId());
         document.append("date", this.date);
         document.append("montant", this.montant);
         document.append("typeOperation", this.typeOperation);
 
         collection.insertOne(document);
 
-        this.setId(document.getObjectId("_id").toString());
+        this.setId(document.getObjectId("_id"));
     }
 
     public void updateOperation() {
@@ -149,7 +149,7 @@ public class Operation {
 
     // Méthodes de recherche et de récupération d'opérations
 
-    public static Operation getOperationById(String operationId) {
+    public static Operation getOperationById(ObjectId operationId) {
         ConnectionString connectionString = new ConnectionString("mongodb+srv://projetbddadmin:projetbddadmin@projetbdd.qhobbmh.mongodb.net/?retryWrites=true&w=majority");
 
         MongoClientSettings settings = MongoClientSettings.builder()
@@ -161,12 +161,12 @@ public class Operation {
         MongoDatabase database = client.getDatabase("projetBDD");
         MongoCollection<Document> collection = database.getCollection("operation");
 
-        Document result = collection.find(eq("_id", new ObjectId(operationId))).first();
+        Document result = collection.find(eq("_id", operationId)).first();
 
         if (result != null) {
-            Operation operation = new Operation(Client.getClientById(result.getObjectId("client").toString()), Compte.getCompteById(result.getObjectId("compte").toString()),
+            Operation operation = new Operation(Client.getClientById(result.getObjectId("client")), Compte.getCompteById(result.getObjectId("compte")),
                     result.getDate("date"), result.getDouble("montant"), result.getString("typeOperation"));
-            operation.setId(result.getObjectId("_id").toString());
+            operation.setId(result.getObjectId("_id"));
             return operation;
         }
 
@@ -189,9 +189,9 @@ public class Operation {
         List<Operation> operations = new ArrayList<>();
 
         collection.find(filter).forEach((Block<? super Document>) (Document document) -> {
-            Operation operation = new Operation(Client.getClientById(document.getString("client")), Compte.getCompteById(document.getString("compte")),
+            Operation operation = new Operation(Client.getClientById(document.getObjectId("client")), Compte.getCompteById(document.getObjectId("compte")),
                     document.getDate("date"), document.getDouble("montant"), document.getString("typeOperation"));
-            operation.setId(document.getObjectId("_id").toString());
+            operation.setId(document.getObjectId("_id"));
             operations.add(operation);
         });
 

@@ -10,11 +10,12 @@ import org.bson.types.ObjectId;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static com.mongodb.client.model.Filters.eq;
 
 public class Client {
-    private String id;
+    private ObjectId id;
     private String nom;
     private String prenom;
     private String adresse;
@@ -37,11 +38,11 @@ public class Client {
     }
 
     // Getters et setters pour toutes les propriétés
-    public String getId() {
+    public ObjectId getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(ObjectId id) {
         this.id = id;
     }
 
@@ -133,7 +134,7 @@ public class Client {
 
         collection.insertOne(document);
 
-        this.setId(document.getObjectId("_id").toString());
+        this.setId(document.getObjectId("_id"));
     }
 
     public void updateClient() {
@@ -177,7 +178,7 @@ public class Client {
         collection.deleteOne(filter);
     }
 
-    public static Client getClientById(String clientId) {
+    public static Client getClientById(ObjectId clientId) {
         ConnectionString connectionString = new ConnectionString("mongodb+srv://projetbddadmin:projetbddadmin@projetbdd.qhobbmh.mongodb.net/?retryWrites=true&w=majority");
 
         MongoClientSettings settings = MongoClientSettings.builder()
@@ -189,13 +190,13 @@ public class Client {
         MongoDatabase database = client.getDatabase("projetBDD");
         MongoCollection<Document> collection = database.getCollection("client");
 
-        Document result = collection.find(eq("_id", new ObjectId(clientId))).first();
+        Document result = collection.find(eq("_id", clientId)).first();
 
         if (result != null) {
             Client clientObject = new Client(result.getString("nom"), result.getString("prenom"),
                     result.getString("adresse"), result.getString("telephone"),
-                    result.getString("dateNaissance"), result.getString("email"), Agence.getAgenceById(result.getString("agence")));
-            clientObject.setId(result.getObjectId("_id").toString());
+                    result.getString("dateNaissance"), result.getString("email"), Agence.getAgenceById(result.getObjectId("agence")));
+            clientObject.setId(result.getObjectId("_id"));
             return clientObject;
         }
 
@@ -220,8 +221,8 @@ public class Client {
         if (result != null) {
             Client clientObject = new Client(result.getString("nom"), result.getString("prenom"),
                     result.getString("adresse"), result.getString("telephone"),
-                    result.getString("dateNaissance"), result.getString("email"), Agence.getAgenceById(result.getString("agenceId")));
-            clientObject.setId(result.getString("_id"));
+                    result.getString("dateNaissance"), result.getString("email"), Agence.getAgenceById(result.getObjectId("agenceId")));
+            clientObject.setId(result.getObjectId("_id"));
             return clientObject;
         }
 

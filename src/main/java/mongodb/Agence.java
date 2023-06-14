@@ -14,7 +14,7 @@ import java.util.List;
 import static com.mongodb.client.model.Filters.eq;
 
 public class Agence {
-    private String id;
+    private ObjectId id;
     private String nom;
     private String adresse;
     private String telephone;
@@ -32,11 +32,11 @@ public class Agence {
 
     // Getters et setters pour toutes les propriétés
 
-    public String getId() {
+    public ObjectId getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(ObjectId id) {
         this.id = id;
     }
 
@@ -101,7 +101,7 @@ public class Agence {
 
         collection.insertOne(document);
 
-        this.setId(document.getObjectId("_id").toString());
+        this.setId(document.getObjectId("_id"));
     }
 
     public void updateAgence() {
@@ -143,7 +143,7 @@ public class Agence {
     }
 
     // Méthodes de recherche et de récupération d'agences
-    public static Agence getAgenceById(String agenceId) {
+    public static Agence getAgenceById(ObjectId agenceId) {
         ConnectionString connectionString = new ConnectionString("mongodb+srv://projetbddadmin:projetbddadmin@projetbdd.qhobbmh.mongodb.net/?retryWrites=true&w=majority");
 
         MongoClientSettings settings = MongoClientSettings.builder()
@@ -155,12 +155,12 @@ public class Agence {
         MongoDatabase database = client.getDatabase("projetBDD");
         MongoCollection<Document> collection = database.getCollection("agence");
 
-        Document result = collection.find(eq("_id", new ObjectId(agenceId))).first();
+        Document result = collection.find(eq("_id", agenceId)).first();
 
         if (result != null) {
             Agence agence = new Agence(result.getString("nom"), result.getString("adresse"),
                     result.getString("telephone"), result.getString("email"));
-            agence.setId(result.getObjectId("_id").toString());
+            agence.setId(result.getObjectId("_id"));
             return agence;
         }
 
