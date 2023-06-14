@@ -18,11 +18,10 @@ public class Employe {
     private String dateNaissance;
     private String dateEmbauche;
     private double salaire;
-
     private Agence agence;
 
     // Constructeur
-    public Employe(String nom, String prenom, String adresse, String telephone, String email, String dateNaissance, String dateEmbauche, double salaire) {
+    public Employe(String nom, String prenom, String adresse, String telephone, String email, String dateNaissance, String dateEmbauche, double salaire, Agence agence) {
         this.nom = nom;
         this.prenom = prenom;
         this.adresse = adresse;
@@ -31,6 +30,7 @@ public class Employe {
         this.dateNaissance = dateNaissance;
         this.dateEmbauche = dateEmbauche;
         this.salaire = salaire;
+        this.agence = agence;
     }
 
     // Getters et setters pour toutes les propriétés
@@ -179,7 +179,8 @@ public class Employe {
                         employeNode.get("email").asString(),
                         employeNode.get("dateNaissance").asString(),
                         employeNode.get("dateEmbauche").asString(),
-                        employeNode.get("salaire").asDouble()
+                        employeNode.get("salaire").asDouble(),
+                        Agence.getAgenceById(driver, employeNode.get("agenceId").asString())
                 );
                 employe.setId(employeNode.get("id").asString());
                 return employe;
@@ -283,7 +284,8 @@ public class Employe {
                         employeNode.get("email").asString(),
                         employeNode.get("dateNaissance").asString(),
                         employeNode.get("dateEmbauche").asString(),
-                        employeNode.get("salaire").asDouble()
+                        employeNode.get("salaire").asDouble(),
+                        Agence.getAgenceById(driver, employeNode.get("agenceId").asString())
                 );
                 employe.setId(employeNode.get("id").asString());
                 employesSortedByNom.add(employe);
@@ -316,7 +318,8 @@ public class Employe {
                         employeNode.get("email").asString(),
                         employeNode.get("dateNaissance").asString(),
                         employeNode.get("dateEmbauche").asString(),
-                        employeNode.get("salaire").asDouble()
+                        employeNode.get("salaire").asDouble(),
+                        Agence.getAgenceById(driver, employeNode.get("agenceId").asString())
                 );
                 employe.setId(employeNode.get("id").asString());
                 employes.add(employe);

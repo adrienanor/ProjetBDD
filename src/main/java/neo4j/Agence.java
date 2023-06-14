@@ -21,7 +21,7 @@ public class Agence {
         this.adresse = adresse;
         this.telephone = telephone;
         this.email = email;
-        employes = new ArrayList<>();
+        employes = new ArrayList<Employe>();
     }
 
     // Getters et setters pour toutes les propriétés
