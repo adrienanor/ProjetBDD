@@ -1,6 +1,8 @@
 package neo4j;
 
 import org.neo4j.driver.*;
+import org.neo4j.driver.Record;
+
 import static org.neo4j.driver.Values.parameters;
 
 import java.io.BufferedReader;
@@ -9,6 +11,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
 
 public class DataGenerationNeo4j {
 
@@ -60,38 +63,47 @@ public class DataGenerationNeo4j {
     }
 
     public static void main(String[] args) {
-        try {
+        String uri = "neo4j+s://91d8e935.databases.neo4j.io";
+        String user = "neo4j";
+        String password = "K01Vs880wyeLSSe6kJXXS2eX93c1Inos9W7ZV3PAFi0";
+
+        Driver driver = GraphDatabase.driver(uri, AuthTokens.basic(user, password));
+
+        try (Session session = driver.session()) {
             List<String[]> clients = generateClientsData();
             List<String[]> comptes = generateComptesData();
             List<String[]> operations = generateOperationsData();
             List<String[]> agences = generateAgencesData();
             List<String[]> employes = generateEmployesData();
 
-            // Connexion à la base de données Neo4j
-            Driver driver = GraphDatabase.driver(
-                    "neo4j+s://" + System.getenv("760dbeec.databases.neo4j.io"),
-                    AuthTokens.basic(System.getenv("neo4j"), System.getenv("77yxPdT-1WryEoPehgpVwsMbpEnOQCoK_cRABjuvA_E"))
-            );
-            Session session = driver.session();
+            // Insérer les données des employés
+            insertData(session, "CREATE (e:Employe {id: $id, name: $name, agenceId: $agenceId})", employes,
+                    new String[]{"id", "name", "agenceId"});
 
-            // Insérer les données dans la base de données
-            insertData(session, "CREATE (:mongodb.Client {id: $id, name: $name, age: $age})",
-                    clients, new String[]{"id", "name", "age"});
-            insertData(session, "CREATE (:mongodb.Compte {id: $id, balance: $balance, clientId: $clientId})",
-                    comptes, new String[]{"id", "balance", "clientId"});
-            insertData(session, "CREATE (:mongodb.Operation {id: $id, description: $description, compteId: $compteId})",
+            // Insérer les données des clients
+            insertData(session, "CREATE (c:Client {id: $id, name: $name, age: $age})", clients,
+                    new String[]{"id", "name", "age"});
+
+            // Insérer les données des comptes
+            insertData(session, "CREATE (cpt:Compte {id: $id, balance: $balance, clientId: $clientId})", comptes,
+                    new String[]{"id", "balance", "clientId"});
+
+            // Insérer les données des opérations
+            insertData(session, "CREATE (op:Operation {id: $id, description: $description, compteId: $compteId})",
                     operations, new String[]{"id", "description", "compteId"});
-            insertData(session, "CREATE (:mongodb.Agence {id: $id, name: $name, location: $location})",
-                    agences, new String[]{"id", "name", "location"});
-            insertData(session, "CREATE (:mongodb.Employe {id: $id, name: $name, agenceId: $agenceId})",
-                    employes, new String[]{"id", "name", "agenceId"});
 
-            session.close();
-            driver.close();
+            // Insérer les données des agences
+            insertData(session, "CREATE (a:Agence {id: $id, name: $name, location: $location})", agences,
+                    new String[]{"id", "name", "location"});
+
+
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
+
+        driver.close();
     }
+
 
     private static void insertData(Session session, String query, List<String[]> data, String[] parameters) {
         for (String[] row : data) {
