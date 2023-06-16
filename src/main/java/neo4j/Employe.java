@@ -119,7 +119,7 @@ public class Employe {
 
     public void insertEmploye(Driver driver) {
         try (Session session = driver.session()) {
-            String query = "CREATE (e:Employe {nom: $nom, prenom: $prenom, adresse: $adresse, telephone: $telephone, email: $email, dateNaissance: $dateNaissance, dateEmbauche: $dateEmbauche, salaire: $salaire}) RETURN e";
+            String query = "CREATE (e:Employe {nom: $nom, prenom: $prenom, adresse: $adresse, telephone: $telephone, email: $email, dateNaissance: $dateNaissance, dateEmbauche: $dateEmbauche, salaire: $salaire, agenceId: $agenceId}) RETURN ID(e) AS id";
             Value parameters = Values.parameters(
                     "nom", this.nom,
                     "prenom", this.prenom,
@@ -128,18 +128,23 @@ public class Employe {
                     "email", this.email,
                     "dateNaissance", this.dateNaissance,
                     "dateEmbauche", this.dateEmbauche,
-                    "salaire", this.salaire
+                    "salaire", this.salaire,
+                    "agenceId", this.agence.getId()
             );
             Result result = session.run(query, parameters);
-            this.id = result.single().get("e").asNode().get("id").asString();
+
+            if (result.hasNext()) {
+                Record record = result.next();
+                this.id = String.valueOf(record.get("id").asLong());
+            }
         }
     }
 
     public void updateEmploye(Driver driver) {
         try (Session session = driver.session()) {
-            String query = "MATCH (e:Employe) WHERE e.id = $id SET e.nom = $nom, e.prenom = $prenom, e.adresse = $adresse, e.telephone = $telephone, e.email = $email, e.dateNaissance = $dateNaissance, e.dateEmbauche = $dateEmbauche, e.salaire = $salaire";
+            String query = "MATCH (e:Employe) WHERE ID(e) = $id SET e.nom = $nom, e.prenom = $prenom, e.adresse = $adresse, e.telephone = $telephone, e.email = $email, e.dateNaissance = $dateNaissance, e.dateEmbauche = $dateEmbauche, e.salaire = $salaire";
             Value parameters = Values.parameters(
-                    "id", this.id,
+                    "id", Long.parseLong(this.id),
                     "nom", this.nom,
                     "prenom", this.prenom,
                     "adresse", this.adresse,
@@ -155,8 +160,8 @@ public class Employe {
 
     public void deleteEmploye(Driver driver) {
         try (Session session = driver.session()) {
-            String query = "MATCH (e:Employe) WHERE e.id = $id DELETE e";
-            Value parameters = Values.parameters("id", this.id);
+            String query = "MATCH (e:Employe) WHERE ID(e) = $id DELETE e";
+            Value parameters = Values.parameters("id", Long.parseLong(this.id));
             session.run(query, parameters);
         }
     }
@@ -165,12 +170,13 @@ public class Employe {
 
     public static Employe getEmployeById(Driver driver, String employeId) {
         try (Session session = driver.session()) {
-            String query = "MATCH (e:Employe) WHERE e.id = $id RETURN e";
-            Value parameters = Values.parameters("id", employeId);
+            String query = "MATCH (e:Employe) WHERE ID(e) = $id RETURN e";
+            Value parameters = Values.parameters("id", Long.parseLong(employeId));
             Result result = session.run(query, parameters);
 
             if (result.hasNext()) {
-                Node employeNode = result.single().get("e").asNode();
+                Record record = result.next();
+                Node employeNode = record.get("e").asNode();
                 Employe employe = new Employe(
                         employeNode.get("nom").asString(),
                         employeNode.get("prenom").asString(),
@@ -182,7 +188,8 @@ public class Employe {
                         employeNode.get("salaire").asDouble(),
                         Agence.getAgenceById(driver, employeNode.get("agenceId").asString())
                 );
-                employe.setId(employeNode.get("id").asString());
+
+                employe.setId(employeId);
                 return employe;
             }
 
@@ -193,7 +200,7 @@ public class Employe {
     // Méthode pour créer une relation "TRAVAILLE_DANS" entre un employé et une agence
     public void travailleDansAgence(Driver driver, Agence agence) {
         try (Session session = driver.session()) {
-            String query = "MATCH (e:Employe), (a:Agence) WHERE e.id = $employeId AND a.id = $agenceId CREATE (e)-[:TRAVAILLE_DANS]->(a)";
+            String query = "MATCH (e:Employe), (a:Agence) WHERE ID(e) = $employeId AND ID(a)= $agenceId CREATE (e)-[:TRAVAILLE_DANS]->(a)";
             Value parameters = Values.parameters(
                     "employeId", this.id,
                     "agenceId", agence.getId()

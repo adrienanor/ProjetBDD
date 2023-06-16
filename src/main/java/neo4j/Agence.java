@@ -124,8 +124,8 @@ public class Agence {
     public static Agence getAgenceById(Driver driver, String agenceId) {
         try (Session session = driver.session()) {
 
-            String query = "MATCH (a:Agence) WHERE ID(a) = " + agenceId + " RETURN a";
-            Result result = session.run(query, Values.parameters("id", agenceId));
+            String query = "MATCH (a:Agence) WHERE ID(a) = $id RETURN a";
+            Result result = session.run(query, Values.parameters("id", Long.parseLong(agenceId)));
 
             if (result.hasNext()) {
                 Record record = result.single();
